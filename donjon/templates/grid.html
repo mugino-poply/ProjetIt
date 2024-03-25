@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afficher une image depuis un select</title>
+    <style>
+        /* Style optionnel pour la mise en forme */
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        img {
+            max-width: 100%;
+            height: 200px;
+            margin-top: 10px;
+            display: none;
+            /* Cacher l'image par défaut */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sélection d'image -->
+    <select id="imageSelect">
+        <option value="../static/img1.png">Image 1</option>
+        <option value="../static/img2.png">Image 2</option>
+        <option value="../static/img3.JPG">Image 3</option>
+        <option value="../static/img4.jpg">Image 4</option>
+        <option value="../static/img5.JPG">Image 5</option>
+        <option value="../static/img6.png">Image 6</option>
+        <option value="../static/img7.jpg">Image 7</option>
+        <option value="../static/img8.jpg">Image 8</option>
+        <option value="../static/img9.JPG">Image 9</option>
+    </select>
+    <br>
+    <!-- Affichage de l'image sélectionnée -->
+    <img id="selectedImage" src="" alt="Image sélectionnée">
+
+    <script>
+        // Fonction pour mettre à jour l'image lors du changement de sélection
+        document.getElementById('imageSelect').addEventListener('change', function () {
+            var selectedImage = document.getElementById('selectedImage');
+            var selectedOption = this.options[this.selectedIndex];
+            var imagePath = selectedOption.value;
+            selectedImage.src = imagePath;
+            selectedImage.style.display = (imagePath !== "") ? "block" : "none"; // Afficher l'image seulement si une option valide est sélectionnée
+        });
+    </script>
+
+</body>
+
+</html>

@@ -6,36 +6,37 @@ import math
 
 # D'abord on crée notre application Flask 
 app = Flask(__name__)
-
-# avancer = Button(8)
-# reculer = Button(1)
-# gauche = Button(7)
-# droite = Button(25)
-# enter = Button(0)
-# buzzer = TonalBuzzer(12)
-# led = RGBLED(red=21, green=20, blue=16)
+pygame.init()
+# avancer = Button(26)
+# reculer = Button(20)
+# gauche = Button(21)
+# droite = Button(16)
+# buzzer = TonalBuzzer(19)
 
 
-@app.route('/',methods = ['POST', 'GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template("index.html")
-
-@app.route('/jeu', methods = ['POST', 'GET'])
-def play_game():
     if request.method == 'POST':
-        score = jeu(request.form['red'], request.form['green'], request.form['blue'])
-        return f"{request.form['jouer']} - score: {score}"
+        color = request.form.get('head')
+        image = request.form.get('imageSelect')
+        if image is not None:
+            image = image.value
+        score = jeu(color,image)
+        return f"Score: {score}"
+    else:
+        jeu('#e66465', 'static/img1.png')
+        return render_template("index.html")
 
 
 
 
 ######################## pygame setup #####################
 
-def init_jeu(Rgb, rGb, rgB):
-    IMAGE = pygame.image.load('static/EPHEC.jpeg')
+def init_jeu(hexColor,background):
+    IMAGE = pygame.image.load(background)
     TAILLE_ECRAN = IMAGE.get_size()
     TAILLE_BOULE = 10
-    COULEUR_PION = (Rgb, rGb, rgB)
+    COULEUR_PION = (hexColor)
     COULEUR_TEXTE = (255, 255, 255)
     COULEUR_FOND = (211, 211, 211)
     MID_X = TAILLE_ECRAN[0]//2
@@ -46,10 +47,9 @@ def init_jeu(Rgb, rGb, rgB):
 
 ###########################################################
 
-def jeu(Rgb, rGb, rgB):
-    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(Rgb, rGb, rgB) 
 
-    pygame.init()
+def jeu(couleur, image):
+    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(couleur,image) 
     screen = pygame.display.set_mode(TAILLE_ECRAN)
     pygame.display.set_caption("jeu du point")
     temps = pygame.time
@@ -80,21 +80,20 @@ def jeu(Rgb, rGb, rgB):
         
         pygame.draw.circle(screen, COULEUR_PION, player_pos, TAILLE_BOULE)
 
-        
-        if avancer.when_pressed:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
             player_pos.y -= 150 * dt
-        if reculer.when_pressed:
+        if keys[pygame.K_DOWN]:
             player_pos.y += 150 * dt
-        if gauche.when_pressed:
+        if keys[pygame.K_LEFT]:
             player_pos.x -= 150 * dt
-        if droite.when_pressed:
+        if keys[pygame.K_RIGHT]:
             player_pos.x += 150 * dt
-        if enter.when_pressed:
+        if keys[pygame.K_RETURN]:
             pos_finale = (player_pos.x, player_pos.y)
             diff = (MID_X - pos_finale[0], MID_Y - pos_finale[1])
-            string_l1 = f"Horizontalement, vous êtes à  {str(round(abs(diff[0])))} pixels du centre"
-            string_l2 = f"Verticalement, vous êtes à {str(round(abs(diff[1])))} pixels du centre"
-            string_l3 = f"distance diagonale du centre: {round(hypothenuse(diff[0],diff[1]),2)}"
+            string_l1 = f"Horizontalement, vous êtes à {round(abs(diff[0]))} pixels du centre"
+            string_l2 = f"Verticalement, vous êtes à {round(abs(diff[1]))} pixels du centre"
             msg_fin_l1 = police.render(string_l1, True, COULEUR_PION, COULEUR_FOND)
             msg_fin_l2 = police.render(string_l2, True, COULEUR_PION, COULEUR_FOND)
             screen.blit(msg_fin_l1, (LARGEUR_MSG//2, HAUTEUR_MSG//6))

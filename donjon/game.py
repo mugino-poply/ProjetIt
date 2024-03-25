@@ -1,9 +1,7 @@
-import pygame
-import random
-######################## pygame setup #####################
+import pygame, random, math
 
-def init_jeu(Rgb, rGb, rgB, photo):
-    IMAGE = pygame.image.load(photo)
+def init_jeu(Rgb, rGb, rgB):
+    IMAGE = pygame.image.load('static/EPHEC.jpeg')
     TAILLE_ECRAN = IMAGE.get_size()
     TAILLE_BOULE = 10
     COULEUR_PION = (Rgb, rGb, rgB)
@@ -17,8 +15,8 @@ def init_jeu(Rgb, rGb, rgB, photo):
 
 ###########################################################
 
-def jeu(Rgb, rGb, rgB,photo):
-    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(Rgb, rGb, rgB, photo) 
+def jeu(Rgb, rGb, rgB):
+    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(Rgb, rGb, rgB) 
 
     pygame.init()
     screen = pygame.display.set_mode(TAILLE_ECRAN)
@@ -81,11 +79,14 @@ def jeu(Rgb, rGb, rgB,photo):
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
         dt = clock.tick(60) / 1000
-
+    
     pygame.quit()
+    return hypothenuse(diff[0],diff[1])
 
 
 
 def hypothenuse(x,y):
     return math.sqrt(x*x + y*y)
 
+
+jeu(255,255,255)
