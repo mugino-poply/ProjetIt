@@ -1,6 +1,5 @@
-# from gpiozero import LED, Button
+# from gpiozero import LED, Button, TonalBuzzer
 # from time import sleep
-# from gpiozero import TonalBuzzer
 from flask import Flask, render_template, request
 import pygame, random
 import math

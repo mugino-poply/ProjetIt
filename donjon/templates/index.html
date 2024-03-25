@@ -17,6 +17,10 @@
         function reset_border() {
             currentSelection.style.border = "none"
         }
+
+        function get_rgb(colorId) {
+            return document.getElementById(colorId).value
+        }
     </script>
 
     <style>
@@ -84,7 +88,7 @@
     <br>
     <br>
 
-    <form>
+    <form id="form">
         <label for="idJoueur">Tag joueur: </label>
         <input id="idJoueur" name="jouer" type="text">
         <br><br>
@@ -138,7 +142,7 @@
 
 
         <br><br><br>
-        <input type="submit" value="Lancer partie">
+        <input type="submit" value="Lancer partie" onclick="{{jeu(get_rgb('colorRed'), get_rgb('colorGreen'), get_rgb('colorBlue'))}}">
         <input type="reset" value="reset" onclick="reset_border()">
     </form>
     <br>
