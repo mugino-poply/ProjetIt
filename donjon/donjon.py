@@ -1,5 +1,6 @@
-# from gpiozero import LED, Button, TonalBuzzer
+# from gpiozero import LED, Button
 # from time import sleep
+# from gpiozero import TonalBuzzer
 from flask import Flask, render_template, request
 import pygame, random
 import math
@@ -7,11 +8,13 @@ import math
 # D'abord on crée notre application Flask 
 app = Flask(__name__)
 
-# avancer = Button(26)
-# reculer = Button(20)
-# gauche = Button(21)
-# droite = Button(16)
-# buzzer = TonalBuzzer(19)
+# avancer = Button(8)
+# reculer = Button(1)
+# gauche = Button(7)
+# droite = Button(25)
+# enter = Button(0)
+# buzzer = TonalBuzzer(12)
+# led = RGBLED(red=21, green=20, blue=16)
 
 
 @app.route('/',methods = ['POST', 'GET'])
@@ -78,20 +81,21 @@ def jeu(Rgb, rGb, rgB):
         
         pygame.draw.circle(screen, COULEUR_PION, player_pos, TAILLE_BOULE)
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
+        
+        if avancer.when_pressed:
             player_pos.y -= 150 * dt
-        if keys[pygame.K_DOWN]:
+        if reculer.when_pressed:
             player_pos.y += 150 * dt
-        if keys[pygame.K_LEFT]:
+        if gauche.when_pressed:
             player_pos.x -= 150 * dt
-        if keys[pygame.K_RIGHT]:
+        if droite.when_pressed:
             player_pos.x += 150 * dt
-        if keys[pygame.K_RETURN]:
+        if enter.when_pressed:
             pos_finale = (player_pos.x, player_pos.y)
             diff = (MID_X - pos_finale[0], MID_Y - pos_finale[1])
             string_l1 = f"Horizontalement, vous êtes à  {str(round(abs(diff[0])))} pixels du centre"
             string_l2 = f"Verticalement, vous êtes à {str(round(abs(diff[1])))} pixels du centre"
+            string_l3 = f"distance diagonale du centre: {round(hypothenuse(diff[0],diff[1]),2)}"
             msg_fin_l1 = police.render(string_l1, True, COULEUR_PION, COULEUR_FOND)
             msg_fin_l2 = police.render(string_l2, True, COULEUR_PION, COULEUR_FOND)
             screen.blit(msg_fin_l1, (LARGEUR_MSG//2, HAUTEUR_MSG//6))
