@@ -1,0 +1,52 @@
+body {
+    background-color: #1f1f1f;
+    color: #bdcccc;
+}
+
+
+form,
+h1,
+table {
+    margin: 0 auto;
+    width: 500px;
+    text-align: center;
+}
+
+
+input[type=submit],
+input[type=reset] {
+    border-radius: 7px;
+    border: 1px solid white;
+    background-color: crimson;
+    height: 60px;
+    width: 140px;
+}
+
+input[type=submit]:hover,
+input[type=reset]:hover {
+    border-radius: 7px;
+    border: 1px solid white;
+    background-color: rgb(158, 15, 44);
+    height: 60px;
+    width: 140px;
+}
+
+input[type=submit]:active,
+input[type=reset]:active {
+    border-radius: 7px;
+    border: 1px solid white;
+    background-color: rgb(74, 7, 20);
+    height: 60px;
+    width: 140px;
+}
+
+td,
+th {
+    border: 1px solid white;
+    padding: 3px;
+}
+
+
+table {
+    border-collapse: collapse;
+}
