@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title> Donjon RP </title>
+    <title> Jeu de la boule au milieu </title>
     <meta charset="utf-8">
     <script>
         let respData
@@ -74,7 +74,7 @@
         body {
             background-color: #1f1f1f;
             color: #bdcccc;
-            font-family: Arial, sans-serif;
+            font-family: "Palatino", "URW Palladio L", serif;
             /* Utilisation d'une police de caractères générique */
         }
 
@@ -106,12 +106,13 @@
 
         input[type="text"],
         select {
-            width: 100%;
+            width: 99%;
             /* Les champs de saisie prendront la largeur du formulaire */
             padding: 5px;
             margin-bottom: 10px;
             border: none;
             border-radius: 5px;
+            font-family: "Palatino", "URW Palladio L", serif;
         }
 
         input[type="color"],
@@ -134,7 +135,7 @@
         input[type="submit"]:active,
         input[type="reset"]:active {
             background-color: rgb(74, 7, 20);
-            color: #1f1f1f;
+            color: #fff;
         }
 
         select {
@@ -188,11 +189,21 @@
             margin-right: 10px;
             /* Ajouter de l'espace entre les boutons */
         }
+
+        #lancer {
+            font-family: "Palatino", "URW Palladio L", serif;
+            width: 40%;
+        }
+
+        #reset {
+            font-family: "Palatino", "URW Palladio L", serif;
+            width: 20%;
+        }
     </style>
 </head>
 
 <body onload="demarrage()">
-    <h1> Donjon RP</h1>
+    <h1> Jeu de la boule au milieu </h1>
 
     <br>
     <br>
@@ -200,10 +211,10 @@
 
     <section class="container">
         <form id="form" action="/" method="post">
-            <label for="idJoueur">Tag joueur: </label>
+            <label for="idJoueur">Pseudo :</label>
             <input id="idJoueur" name="jouer" type="text" required>
             <br><br>
-            <label for="head">couleur balle</label>
+            <label for="head">Couleur de la balle :</label>
             <input type="color" id="head" name="head" value="#e66465" />
 
             <br><br>
@@ -211,7 +222,7 @@
             <!-- Sélection d'image -->
             <label for="imageSelect">Sélection de l'image de fond: </label>
             <select id="imageSelect" name="imageSelect">
-                <option value="../static/img1.png">Salaméche</option>
+                <option value="../static/img1.png">Salamèche</option>
                 <option value="../static/img2.png">Le Sphinx</option>
                 <option value="../static/img3.JPG">THE Boat</option>
                 <option value="../static/img4.jpg">THE Bridge</option>
@@ -232,8 +243,8 @@
             <input type="radio" id="hard" name="difficulty" value="3">
             <label for="hard">Hard</label><br>
             <br><br>
-            <input type="submit" value="Lancer partie">
-            <input type="reset" value="reset" onclick="reset_border()">
+            <input type="submit" id="lancer" value="Lancer partie">
+            <input type="reset" id="reset" value="Reset" onclick="reset_border()">
         </form>
         <!-- Affichage de l'image sélectionnée -->
         <script>
