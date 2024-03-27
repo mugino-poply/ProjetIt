@@ -1,5 +1,7 @@
 import pygame, random, math
+from tabulate import tabulate
 
+data = []
 def init_jeu(Rgb, rGb, rgB):
     IMAGE = pygame.image.load('static/EPHEC.jpeg')
     TAILLE_ECRAN = IMAGE.get_size()
@@ -17,7 +19,7 @@ def init_jeu(Rgb, rGb, rgB):
 
 def jeu(Rgb, rGb, rgB):
     IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(Rgb, rGb, rgB) 
-
+    DEPLACEMENT = 150
     pygame.init()
     screen = pygame.display.set_mode(TAILLE_ECRAN)
     pygame.display.set_caption("jeu du point")
@@ -44,32 +46,40 @@ def jeu(Rgb, rGb, rgB):
         if dt == 0:
             screen.blit(msg_debut, (LARGEUR_MSG//2, HAUTEUR_MSG//6))
             pygame.display.update()
-            temps.delay(4000)
+            temps.delay(2000)
 
         
         pygame.draw.circle(screen, COULEUR_PION, player_pos, TAILLE_BOULE)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            player_pos.y -= 150 * dt
+            player_pos.y -= DEPLACEMENT * dt
         if keys[pygame.K_DOWN]:
-            player_pos.y += 150 * dt
+            player_pos.y += DEPLACEMENT * dt
         if keys[pygame.K_LEFT]:
-            player_pos.x -= 150 * dt
+            player_pos.x -= DEPLACEMENT * dt
         if keys[pygame.K_RIGHT]:
-            player_pos.x += 150 * dt
+            player_pos.x += DEPLACEMENT * dt
         if keys[pygame.K_RETURN]:
             pos_finale = (player_pos.x, player_pos.y)
             diff = (MID_X - pos_finale[0], MID_Y - pos_finale[1])
-            string_l1 = f"Horizontalement, vous êtes à  {str(round(abs(diff[0])))} pixels du centre"
-            string_l2 = f"Verticalement, vous êtes à {str(round(abs(diff[1])))} pixels du centre"
-            msg_fin_l1 = police.render(string_l1, True, COULEUR_PION, COULEUR_FOND)
-            msg_fin_l2 = police.render(string_l2, True, COULEUR_PION, COULEUR_FOND)
+            string_l1 = f"Horizontalement, vous êtes à  {round(abs(diff[0]))} pixels du centre"
+            string_l2 = f"Verticalement, vous êtes à {round(abs(diff[1]))} pixels du centre"
+            string_l3 = f"SCORE = {hypothenuse(diff[0],diff[1])}"
+            msg_fin_l1 = police.render(string_l1, True, COULEUR_TEXTE, COULEUR_FOND)
+            msg_fin_l2 = police.render(string_l2, True, COULEUR_TEXTE, COULEUR_FOND)
+            msg_fin_l3 = police.render(string_l3, True, COULEUR_TEXTE, COULEUR_FOND)
             screen.blit(msg_fin_l1, (LARGEUR_MSG//2, HAUTEUR_MSG//6))
-            screen.blit(msg_fin_l2, (LARGEUR_MSG//2, HAUTEUR_MSG//6 + HAUTEUR_MSG//6))
+            screen.blit(msg_fin_l2, (LARGEUR_MSG//2, HAUTEUR_MSG//3))
+            screen.blit(msg_fin_l3, (LARGEUR_MSG//2, 1.5*HAUTEUR_MSG//3))
             pygame.display.update()
             temps.delay(3000)
+            
+            score = hypothenuse(diff[0],diff[1])
+            data.append(["nom", score])
+            table = display_table()
             pygame.quit()
+            return score, table
 
 
         # flip() the display to put your work on screen
@@ -80,13 +90,38 @@ def jeu(Rgb, rGb, rgB):
         # independent physics.
         dt = clock.tick(60) / 1000
     
-    pygame.quit()
-    return hypothenuse(diff[0],diff[1])
+
 
 
 
 def hypothenuse(x,y):
-    return math.sqrt(x*x + y*y)
+    return round(math.sqrt(x*x + y*y),2)
+
+
+
+def display_table():
+    headers = ["tag", "score"]
+    table = tabulate(data, headers=headers, tablefmt="grid")
+    return table
 
 
 jeu(255,255,255)
+
+
+
+
+
+
+
+
+end = 10
+start = 3
+pas = 1
+for i in range(start, end, pas):
+    print(i)
+    
+    
+    
+while i < 10:
+    i += 1
+    print (i)

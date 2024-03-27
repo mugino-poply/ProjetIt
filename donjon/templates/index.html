@@ -5,168 +5,261 @@
     <title> Donjon RP </title>
     <meta charset="utf-8">
     <script>
-        let currentSelection;
-        function toggleBorder(img) {
-            if (currentSelection) { // pas la première utilisation
-                currentSelection.style.border = "none"; // enlève la bordure de l'image précédente     
+        let respData
+
+
+        function mkTab(raws) {
+            return `
+            <table>
+            <thead>
+                <tr>
+                    <th id="tag" onclick=trie_nom()> tag </th>
+                    <th id="score" onclick=trie_score()> score </th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                ${raws}
+            </tbody>
+        </table>
+            `}
+
+        function mkTr(tag, score) {
+            return `
+            <tr>
+                <td> ${tag} </td>
+                <td> ${score} </td>
+            </tr>
+            `}
+
+
+        function tableau_html(list) {
+            let body = ""
+            for (let i in list) {
+                body += mkTr(list[i][0], list[i][1])
             }
-            currentSelection = img; // change l'image sélectionnée
-            currentSelection.style.border = "2px solid #3DC3C5";
+            return mkTab(body)
         }
 
-        function reset_border() {
-            currentSelection.style.border = "none"
+
+
+        function demarrage() {
+            let xhr = new XMLHttpRequest
+            xhr.open('GET', 'http://169.254.32.191:8000/tableau')
+            xhr.onload = function () {
+                let ligne = ""
+                respData = JSON.parse(xhr.responseText)
+                console.log(respData)
+                board = document.getElementById('leaderBoard')
+                board.innerHTML = tableau_html(respData)
+            }
+            xhr.send()
         }
 
-        function get_rgb(colorId) {
-            return document.getElementById(colorId).value
+        function trie_nom() {
+            respData.sort((a, b) => a[0].localeCompare(b[0]))
+            console.log(respData)
+            board = document.getElementById('leaderBoard')
+            board.innerHTML = tableau_html(respData)
         }
+        function trie_score() {
+            respData.sort((a, b) => a[1] - b[1])
+            console.log(respData)
+            board = document.getElementById('leaderBoard')
+            board.innerHTML = tableau_html(respData)
+        }
+
     </script>
-
     <style>
         body {
             background-color: #1f1f1f;
             color: #bdcccc;
+            font-family: Arial, sans-serif;
+            /* Utilisation d'une police de caractères générique */
         }
 
-
-        /* Style optionnel pour la mise en forme */
-        select {
-            padding: 5px;
-            font-size: 16px;
-        }
-
-
-
-        form,
-        h1,
-        table {
-            margin: 0 auto;
-            width: 500px;
+        h1 {
             text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form {
+            width: 60%;
+            /* Form prendra 60% de la largeur de .container */
+            background-color: #646363;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        label {
+            display: block;
+            /* Pour que les labels soient affichés en bloc (un en dessous de l'autre) */
+            margin-bottom: 10px;
+            color: #fff;
+            /* Couleur du texte */
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            /* Les champs de saisie prendront la largeur du formulaire */
+            padding: 5px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="color"],
+        input[type="submit"],
+        input[type="reset"] {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            color: #1f1f1f;
+        }
+
+        input[type="submit"]:hover,
+        input[type="reset"]:hover {
+            color: #1f1f1f;
+            background-color: rgb(158, 15, 44);
+        }
+
+        input[type="submit"]:active,
+        input[type="reset"]:active {
+            background-color: rgb(74, 7, 20);
+            color: #1f1f1f;
+        }
+
+        select {
+            width: 100%;
         }
 
         img {
-            max-width: 100%;
-            height: 200px;
+            max-width: 40%;
+            height: auto;
+            /* Pour maintenir les proportions de l'image */
             margin-top: 10px;
+            border-radius: 5px;
             display: none;
+
+        }
+
+        #leaderboard {
             text-align: center;
-            margin: 0 auto;
-            /* Cacher l'image par défaut */
+            color: #fff;
         }
-
-        input[type=submit],
-        input[type=reset] {
-            border-radius: 7px;
-            border: 1px solid white;
-            background-color: crimson;
-            height: 60px;
-            width: 140px;
-        }
-
-        input[type=submit]:hover,
-        input[type=reset]:hover {
-            border-radius: 7px;
-            border: 1px solid white;
-            background-color: rgb(158, 15, 44);
-            height: 60px;
-            width: 140px;
-        }
-
-        input[type=submit]:active,
-        input[type=reset]:active {
-            border-radius: 7px;
-            border: 1px solid white;
-            background-color: rgb(74, 7, 20);
-            height: 60px;
-            width: 140px;
-        }
-
-        td,
-        th {
-            border: 1px solid white;
-            padding: 3px;
-        }
-
 
         table {
+            border-radius: 12px;
+            margin: 0 auto;
+            width: 75%;
             border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            text-align: center;
+            padding: 8px;
+            border-bottom: 1px solid #fff;
+            /* Ligne de séparation */
+        }
+
+        table th {
+            cursor: pointer;
+            background-color: #862a2a;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #646363;
+        }
+
+        input[type="radio"] {
+            display: inline-block;
+            /* Afficher les boutons en ligne */
+            margin-right: 10px;
+            /* Ajouter de l'espace entre les boutons */
         }
     </style>
 </head>
 
-<body>
+<body onload="demarrage()">
     <h1> Donjon RP</h1>
-    <section>
-        Jeu de type donjon pour passer d'une salle à une autre
-    </section>
 
     <br>
     <br>
 
-    {% if not show_score %}
-    <form id="form" action="/" method="post">
-        <label for="idJoueur">Tag joueur: </label>
-        <input id="idJoueur" name="jouer" type="text">
-        <br><br>
-        <input type="color" id="head" name="head" value="#e66465" />
-        <label for="head">couleur balle</label>
 
-        <br><br>
+    <section class="container">
+        <form id="form" action="/" method="post">
+            <label for="idJoueur">Tag joueur: </label>
+            <input id="idJoueur" name="jouer" type="text" required>
+            <br><br>
+            <label for="head">couleur balle</label>
+            <input type="color" id="head" name="head" value="#e66465" />
 
-        <!-- Sélection d'image -->
-        <label for="imageSelect">Sélection de l'image de fond: </label>
-        <select id="imageSelect" name="imageSelect">
-            <option value="../static/img1.png">Salaméche</option>
-            <option value="../static/img2.png">Le Sphinx</option>
-            <option value="../static/img3.JPG">THE Boat</option>
-            <option value="../static/img4.jpg">THE Bridge</option>
-            <option value="../static/img5.JPG">DracoFeu</option>
-            <option value="../static/img6.png">THE Mont Blanc</option>
-            <option value="../static/img7.jpg">Smashed Bros</option>
-            <option value="../static/img8.jpg">THE Egg</option>
-            <option value="../static/img9.JPG">Fond d'écran stylé</option>
-        </select>
-        <br><br>
+            <br><br>
+
+            <!-- Sélection d'image -->
+            <label for="imageSelect">Sélection de l'image de fond: </label>
+            <select id="imageSelect" name="imageSelect">
+                <option value="../static/img1.png">Salaméche</option>
+                <option value="../static/img2.png">Le Sphinx</option>
+                <option value="../static/img3.JPG">THE Boat</option>
+                <option value="../static/img4.jpg">THE Bridge</option>
+                <option value="../static/img5.JPG">DracoFeu</option>
+                <option value="../static/img6.png">THE Mont Blanc</option>
+                <option value="../static/img7.jpg">Smashed Bros</option>
+                <option value="../static/img8.jpg">THE Egg</option>
+                <option value="../static/img9.JPG">Fond d'écran stylé</option>
+            </select>
+            <br><br>
+
+            <input type="radio" id="easy" name="difficulty" value="1" checked>
+            <label for="easy">Easy</label><br>
+
+            <input type="radio" id="medium" name="difficulty" value="2">
+            <label for="medium">Medium</label><br>
+
+            <input type="radio" id="hard" name="difficulty" value="3">
+            <label for="hard">Hard</label><br>
+            <br><br>
+            <input type="submit" value="Lancer partie">
+            <input type="reset" value="reset" onclick="reset_border()">
+        </form>
         <!-- Affichage de l'image sélectionnée -->
-        <img id="selectedImage" src="" alt="Image sélectionnée">
-
         <script>
+            let currentSelection;
+            function reset_border() {
+                currentSelection.style.border = "none"
+            }
+
             // Fonction pour mettre à jour l'image lors du changement de sélection
             document.getElementById('imageSelect').addEventListener('change', function () {
                 var selectedImage = document.getElementById('selectedImage');
                 var selectedOption = this.options[this.selectedIndex];
                 var imagePath = selectedOption.value;
                 selectedImage.src = imagePath;
+                selectedImage.value = imagePath;
                 selectedImage.style.display = (imagePath !== "") ? "block" : "none"; // Afficher l'image seulement si une option valide est sélectionnée
             });
         </script>
-
-
-        <br><br><br>
-        <input type="submit" value="Lancer partie">
-        <input type="reset" value="reset" onclick="reset_border()">
-    </form>
-    {% else %}
-    <p>Score: {{ score }}</p>
-    {% endif %}
+        <img id="selectedImage" name="selectedImage" src="" alt="Image sélectionnée" value="">
+    </section>
     <br>
     <br>
     <br>
-    <table id="leader board">
-        <thead>
-            <th>tag</th>
-            <th>score</th>
-        </thead>
+    <span id="leaderBoard">
 
-        <tbody>
-            <tr>
-                <td>Nathan</td>
-                <td>4.91s</td>
-            </tr>
-        </tbody>
-    </table>
+    </span>
 </body>
 
 </html>

@@ -1,39 +1,44 @@
-# from gpiozero import LED, Button, TonalBuzzer
-# from time import sleep
+from gpiozero import RGBLED, Button, TonalBuzzer
+from time import sleep
 from flask import Flask, render_template, request
 import pygame, random
 import math
+from json import dumps
+
+
 
 # D'abord on crée notre application Flask 
 app = Flask(__name__)
-pygame.init()
-# avancer = Button(26)
-# reculer = Button(20)
-# gauche = Button(21)
-# droite = Button(16)
-# buzzer = TonalBuzzer(19)
+data = [["nathan",32.9], ["PA", 32]]
+haut = Button(20)
+bas = Button(26)
+gauche = Button(16)
+droite = Button(21)
+buzzer = TonalBuzzer(13)
+enter = Button(19)
+ledRGB = RGBLED(2,3,4)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if request.method == 'POST':
+    if request.method == 'POST':  #envoie du formulaire
+        name = request.form.get('jouer')
         color = request.form.get('head')
-        image = request.form.get('imageSelect')
-        if image is not None:
-            image = image.value
-        score = jeu(color,image)
-        return f"Score: {score}"
+        difficulte = request.form.get('difficulty')
+        jeu(color, name, difficulte)
+        return render_template("index.html", tableau=data)      
     else:
-        jeu('#e66465', 'static/img1.png')
         return render_template("index.html")
 
 
 
-
+@app.route('/tableau', methods=['GET'])
+def get_data_tab():
+    return dumps(data)
 ######################## pygame setup #####################
 
-def init_jeu(hexColor,background):
-    IMAGE = pygame.image.load(background)
+def init_jeu(hexColor):
+    IMAGE = pygame.image.load("static/EPHEC.jpeg")
     TAILLE_ECRAN = IMAGE.get_size()
     TAILLE_BOULE = 10
     COULEUR_PION = (hexColor)
@@ -48,9 +53,12 @@ def init_jeu(hexColor,background):
 ###########################################################
 
 
-def jeu(couleur, image):
-    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(couleur,image) 
-    screen = pygame.display.set_mode(TAILLE_ECRAN)
+def jeu(couleur, nom, difficulte):
+    pygame.init()
+    IMAGE,TAILLE_ECRAN,TAILLE_BOULE,COULEUR_FOND,COULEUR_PION,COULEUR_TEXTE,MID_X,MID_Y,LARGEUR_MSG,HAUTEUR_MSG = init_jeu(couleur) 
+    DEPLACEMENT = 150 * int(difficulte)
+    set_led_color(ledRGB, couleur)
+    screen = pygame.display.set_mode((640, 480))
     pygame.display.set_caption("jeu du point")
     temps = pygame.time
     running = True
@@ -75,32 +83,39 @@ def jeu(couleur, image):
         if dt == 0:
             screen.blit(msg_debut, (LARGEUR_MSG//2, HAUTEUR_MSG//6))
             pygame.display.update()
-            temps.delay(4000)
+            temps.delay(2000)
 
         
         pygame.draw.circle(screen, COULEUR_PION, player_pos, TAILLE_BOULE)
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            player_pos.y -= 150 * dt
-        if keys[pygame.K_DOWN]:
-            player_pos.y += 150 * dt
-        if keys[pygame.K_LEFT]:
-            player_pos.x -= 150 * dt
-        if keys[pygame.K_RIGHT]:
-            player_pos.x += 150 * dt
-        if keys[pygame.K_RETURN]:
+        if haut.is_pressed():
+            player_pos.y -= DEPLACEMENT * dt
+        if bas.is_pressed():
+            player_pos.y += DEPLACEMENT * dt
+        if gauche.is_pressed():
+            player_pos.x -= DEPLACEMENT * dt
+        if droite.is_pressed():
+            player_pos.x += DEPLACEMENT * dt
+        if enter.is_pressed():
             pos_finale = (player_pos.x, player_pos.y)
             diff = (MID_X - pos_finale[0], MID_Y - pos_finale[1])
-            string_l1 = f"Horizontalement, vous êtes à {round(abs(diff[0]))} pixels du centre"
+            string_l1 = f"Horizontalement, vous êtes à  {round(abs(diff[0]))} pixels du centre"
             string_l2 = f"Verticalement, vous êtes à {round(abs(diff[1]))} pixels du centre"
-            msg_fin_l1 = police.render(string_l1, True, COULEUR_PION, COULEUR_FOND)
-            msg_fin_l2 = police.render(string_l2, True, COULEUR_PION, COULEUR_FOND)
+            string_l3 = f"SCORE = {hypothenuse(diff[0],diff[1])}"
+            msg_fin_l1 = police.render(string_l1, True, COULEUR_TEXTE, COULEUR_FOND)
+            msg_fin_l2 = police.render(string_l2, True, COULEUR_TEXTE, COULEUR_FOND)
+            msg_fin_l3 = police.render(string_l3, True, COULEUR_TEXTE, COULEUR_FOND)
             screen.blit(msg_fin_l1, (LARGEUR_MSG//2, HAUTEUR_MSG//6))
-            screen.blit(msg_fin_l2, (LARGEUR_MSG//2, HAUTEUR_MSG//6 + HAUTEUR_MSG//6))
+            screen.blit(msg_fin_l2, (LARGEUR_MSG//2, HAUTEUR_MSG//3))
+            screen.blit(msg_fin_l3, (LARGEUR_MSG//2, 1.5*HAUTEUR_MSG//3))
             pygame.display.update()
             temps.delay(3000)
+            
+            score = hypothenuse(diff[0],diff[1])
+            nom_deja_present(data, nom=nom, score=score)
+
             pygame.quit()
+            return tableau_html()
 
 
         # flip() the display to put your work on screen
@@ -111,25 +126,65 @@ def jeu(couleur, image):
         # independent physics.
         dt = clock.tick(60) / 1000
     
-    pygame.quit()
-    return hypothenuse(diff[0],diff[1])
-
-
 
 def hypothenuse(x,y):
-    return math.sqrt(x*x + y*y)
+    return round(math.sqrt(x*x + y*y),2)
+  
+
+def mkTab(raws):
+    return f"""
+        <table>
+            <thead>
+                <tr>
+                    <th> tag </th>
+                    <th> score </th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {raws}
+            </tbody>
+        </table>
+"""
+
+def mkTr(tag, score):
+    return f"""
+        <tr>
+            <td> {tag} </td>
+            <td> {score} </td>
+        </tr>
+        """
+def nom_deja_present(liste, nom, score):
+    # Parcourir la liste
+    for element in liste:
+        # Vérifier si le nom est déjà présent dans la liste
+        if element[0] == nom:
+            if score > element[1]:
+                element[1] = score  
+    liste.append([nom, score])
+
+def tableau_html():
+    body = ""
+    for donnee in data:
+        body += mkTr(donnee[0],donnee[1])
+    return mkTab(body)
+
+def hex_to_rgb(hex_string):
+    # Assurez-vous que la chaîne hexadécimale est correctement formatée
+    hex_string = hex_string.strip('#')
+    
+    # Séparez les composantes R, G et B
+    red = int(hex_string[0:2], 16) / 255.0
+    green = int(hex_string[2:4], 16) / 255.0
+    blue = int(hex_string[4:6], 16) / 255.0
+    
+    return red, green, blue
 
 
-def mktr(td):
-    return f"<tr>{td}</tr>"
 
-def mktd(txt):
-    return f"<td>{txt}</td>"
-
-
-
-
-
-
-
+def set_led_color(led, hex_color):
+    rgb_color = hex_to_rgb(hex_color)
+    led.color = rgb_color
+    
+    
 app.run(host='0.0.0.0', port=8000)
