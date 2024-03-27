@@ -106,7 +106,7 @@
 
         input[type="text"],
         select {
-            width: 100%;
+            width: 99%;
             /* Les champs de saisie prendront la largeur du formulaire */
             padding: 5px;
             margin-bottom: 10px;
@@ -200,10 +200,10 @@
 
     <section class="container">
         <form id="form" action="/" method="post">
-            <label for="idJoueur">Tag joueur: </label>
+            <label for="idJoueur">Pseudo :</label>
             <input id="idJoueur" name="jouer" type="text" required>
             <br><br>
-            <label for="head">couleur balle</label>
+            <label for="head">Couleur de la balle :</label>
             <input type="color" id="head" name="head" value="#e66465" />
 
             <br><br>
@@ -211,7 +211,7 @@
             <!-- Sélection d'image -->
             <label for="imageSelect">Sélection de l'image de fond: </label>
             <select id="imageSelect" name="imageSelect">
-                <option value="../static/img1.png">Salaméche</option>
+                <option value="../static/img1.png">Salamèche</option>
                 <option value="../static/img2.png">Le Sphinx</option>
                 <option value="../static/img3.JPG">THE Boat</option>
                 <option value="../static/img4.jpg">THE Bridge</option>
@@ -233,7 +233,7 @@
             <label for="hard">Hard</label><br>
             <br><br>
             <input type="submit" value="Lancer partie">
-            <input type="reset" value="reset" onclick="reset_border()">
+            <input type="reset" value="Reset" onclick="reset_border()">
         </form>
         <!-- Affichage de l'image sélectionnée -->
         <script>
